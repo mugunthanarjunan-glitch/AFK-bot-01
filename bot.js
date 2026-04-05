@@ -1,24 +1,38 @@
 const mineflayer = require('mineflayer')
 
-const bot = mineflayer.createBot({
-  host: 'YOUR_SERVER_IP', // example: abc.play.hosting
-  port: 25565,
-  username: 'AFK_Bot_01'
-})
+function createBot() {
+  const bot = mineflayer.createBot({
+    host: 'serveroneeref.play.hosting',
+    port: 30023,
+    username: 'AFK_Bot_01',
+    version: false // auto-detect (important for new versions)
+  })
 
-bot.on('spawn', () => {
-  console.log('Bot joined server!')
+  bot.on('spawn', () => {
+    console.log('✅ Bot joined server!')
 
-  // move randomly to avoid AFK kick
-  setInterval(() => {
-    const actions = ['forward', 'back', 'left', 'right']
-    const action = actions[Math.floor(Math.random() * actions.length)]
+    // Anti-AFK movement
+    setInterval(() => {
+      const actions = ['forward', 'back', 'left', 'right', 'jump']
+      const action = actions[Math.floor(Math.random() * actions.length)]
 
-    bot.setControlState(action, true)
+      bot.setControlState(action, true)
 
-    setTimeout(() => {
-      bot.setControlState(action, false)
-    }, 1000)
+      setTimeout(() => {
+        bot.setControlState(action, false)
+      }, 1000)
 
-  }, 5000)
-})
+    }, 5000)
+  })
+
+  bot.on('error', (err) => {
+    console.log('❌ Error:', err.message)
+  })
+
+  bot.on('end', () => {
+    console.log('⚠️ Bot disconnected. Reconnecting in 10s...')
+    setTimeout(createBot, 10000)
+  })
+}
+
+createBot()
